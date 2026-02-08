@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comprehensive API Diagnostic</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .test-group {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        .test-group h2 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #333;
+        }
+        button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px 5px 5px 0;
+        }
+        button:hover {
+            background: #059669;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .success {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+        .info {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            color: #0c2d6b;
+        }
+        .pending {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #78350f;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .table td:first-child {
+            font-weight: bold;
+            background: #f0f0f0;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 University Gig Marketplace - API Diagnostic</h1>
+        
+        <div class="test-group">
+            <h2>1️⃣ Backend Direct API Tests</h2>
+            <button onclick="testHealth()">Test Health Check</button>
+            <button onclick="testGetUsers()">Get All Users</button>
+            <button onclick="testCreateGig()">Create Test Gig</button>
+            <button onclick="testCheckGigsFile()">Check Gigs.json</button>
+            <div id="backend-result"></div>
+        </div>
+
+        <div class="test-group">
+            <h2>2️⃣ Frontend API Tests (from Vite proxy)</h2>
+            <button onclick="testProxyHealth()">Test /api/health</button>
+            <button onclick="testProxyGetUsers()">GET /api/users</button>
+            <button onclick="testProxyCreateGig()">POST /api/gigs (test)</button>
+            <div id="proxy-result"></div>
+        </div>
+
+        <div class="test-group">
+            <h2>3️⃣ File Permission Tests</h2>
+            <button onclick="testFileAccess()">Test File Access</button>
+            <div id="file-result"></div>
+        </div>
+
+        <div class="test-group">
+            <h2>4️⃣ Network Debug Info</h2>
+            <table class="table">
+                <tr><td>Frontend URL:</td><td id="frontend-url">-</td></tr>
+                <tr><td>Backend URL:</td><td id="backend-url">-</td></tr>
+                <tr><td>Proxy Target:</td><td id="proxy-target">-</td></tr>
+                <tr><td>Request Headers:</td><td><pre id="request-headers">{}</pre></td></tr>
+            </table>
+            <button onclick="showNetworkInfo()">Refresh Info</button>
+        </div>
+
+        <div class="test-group">
+            <h2>5️⃣ Quick Actions</h2>
+            <button onclick="clearAll()">Clear All Results</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+            <button onclick="downloadDiagnostics()">Download Diagnostics</button>
+        </div>
+    </div>
+
+    <script>
+        const resultsLog = {};
+
+        function log(section, status, message, data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const content = data ? `${message}\n\n${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}` : message;
+            resultsLog[section] = { status, timestamp, content };
+            
+            const element = document.getElementById(`${section}-result`);
+            if (element) {
+                const className = status === 'success' ? 'success' : status === 'error' ? 'error' : status === 'pending' ? 'pending' : 'info';
+                element.innerHTML = `<div class="result ${className}"><strong>[${timestamp}]</strong>\n${content}</div>`;
+            }
+        }
+
+        async function testHealth() {
+            log('backend', 'pending', 'Testing /backend/direct-test.php...');
+            try {
+                const response = await fetch('/university-gig-marketplace-clone/backend/direct-test.php');
+                const text = await response.text();
+                log('backend', 'success', 'Backend Health Check Response:', text);
+            } catch (error) {
+                log('backend', 'error', 'Backend Error: ' + error.message);
+            }
+        }
+
+        async function testGetUsers() {
+            log('backend', 'pending', 'Fetching users from backend...');
+            try {
+                const response = await fetch('/university-gig-marketplace-clone/backend/?path=/api/users');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                log('backend', 'success', `Got ${data.length} users`, data);
+            } catch (error) {
+                log('backend', 'error', 'Error: ' + error.message);
+            }
+        }
+
+        async function testCreateGig() {
+            log('backend', 'pending', 'Creating test gig...');
+            try {
+                const response = await fetch('/university-gig-marketplace-clone/backend/index.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        path: '/api/gigs',
+                        sellerId: 'u999',
+                        title: 'Test Gig ' + Date.now(),
+                        description: 'Testing from diagnostic',
+                        department: 'CSE',
+                        price: 999,
+                        deliveryDays: 1,
+                        tags: ['test'],
+                        image: ''
+                    })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                log('backend', 'success', 'Gig created:', data);
+            } catch (error) {
+                log('backend', 'error', 'Error: ' + error.message);
+            }
+        }
+
+        async function testCheckGigsFile() {
+            log('backend', 'pending', 'Checking gigs.json file...');
+            try {
+                const response = await fetch('/university-gig-marketplace-clone/backend/data/gigs.json');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                log('backend', 'success', `Gigs.json contains ${data.length} gigs`, data);
+            } catch (error) {
+                log('backend', 'error', 'Error: ' + error.message);
+            }
+        }
+
+        async function testProxyHealth() {
+            log('proxy', 'pending', 'Testing /api/health via Vite proxy...');
+            try {
+                const response = await fetch('/api/health');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                log('proxy', 'success', 'Health check passed:', data);
+            } catch (error) {
+                log('proxy', 'error', 'Proxy Error: ' + error.message + '\n\nNote: Make sure Vite dev server is running (npm run dev)');
+            }
+        }
+
+        async function testProxyGetUsers() {
+            log('proxy', 'pending', 'Testing GET /api/users via proxy...');
+            try {
+                const response = await fetch('/api/users');
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                const data = await response.json();
+                log('proxy', 'success', `Got ${data.length} users via proxy`, data);
+            } catch (error) {
+                log('proxy', 'error', 'Proxy Error: ' + error.message);
+            }
+        }
+
+        async function testProxyCreateGig() {
+            log('proxy', 'pending', 'Testing POST /api/gigs via proxy...');
+            try {
+                const response = await fetch('/api/gigs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sellerId: 'u999',
+                        title: 'Proxy Test Gig ' + Date.now(),
+                        description: 'Testing via Vite proxy',
+                        department: 'CSE',
+                        price: 5000,
+                        deliveryDays: 3,
+                        tags: ['test', 'proxy'],
+                        image: 'https://example.com/test.jpg'
+                    })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                const data = await response.json();
+                log('proxy', 'success', 'Gig created via proxy:', data);
+            } catch (error) {
+                log('proxy', 'error', 'Proxy Error: ' + error.message);
+            }
+        }
+
+        async function testFileAccess() {
+            log('file', 'info', 'Testing file access...');
+            const tests = [
+                { name: 'users.json', path: '/university-gig-marketplace-clone/backend/data/users.json' },
+                { name: 'gigs.json', path: '/university-gig-marketplace-clone/backend/data/gigs.json' },
+                { name: 'jobs.json', path: '/university-gig-marketplace-clone/backend/data/jobs.json' }
+            ];
+            
+            let results = [];
+            for (const test of tests) {
+                try {
+                    const response = await fetch(test.path);
+                    const data = await response.json();
+                    results.push(`✓ ${test.name}: ${data.length} items`);
+                } catch (e) {
+                    results.push(`✗ ${test.name}: ${e.message}`);
+                }
+            }
+            log('file', 'success', 'File Access Results:', results.join('\n'));
+        }
+
+        function showNetworkInfo() {
+            document.getElementById('frontend-url').textContent = window.location.href;
+            document.getElementById('backend-url').textContent = 'http://localhost/university-gig-marketplace-clone/backend';
+            document.getElementById('proxy-target').textContent = '/api/* → http://localhost/university-gig-marketplace-clone/backend';
+            document.getElementById('request-headers').textContent = JSON.stringify({
+                'Content-Type': 'application/json',
+                'Origin': window.location.origin,
+                'User-Agent': navigator.userAgent.substring(0, 50) + '...'
+            }, null, 2);
+        }
+
+        function clearAll() {
+            document.querySelectorAll('.result').forEach(el => el.innerHTML = '');
+        }
+
+        async function runAllTests() {
+            clearAll();
+            await new Promise(r => setTimeout(r, 100));
+            await testHealth();
+            await new Promise(r => setTimeout(r, 500));
+            await testProxyHealth();
+            await new Promise(r => setTimeout(r, 500));
+            await testCheckGigsFile();
+            await new Promise(r => setTimeout(r, 500));
+            await testFileAccess();
+        }
+
+        function downloadDiagnostics() {
+            const diagnostics = {
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                results: resultsLog
+            };
+            const blob = new Blob([JSON.stringify(diagnostics, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'diagnostics-' + Date.now() + '.json';
+            a.click();
+        }
+
+        // Initialize
+        window.onload = showNetworkInfo;
+    </script>
+</body>
+</html>

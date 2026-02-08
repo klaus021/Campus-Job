@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>API Health Check</h1>
+    
+    <div class="test">
+        <h3>Test 1: Health Check</h3>
+        <button onclick="testHealth()">Test /api/health</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test">
+        <h3>Test 2: Get Users</h3>
+        <button onclick="testGetUsers()">Test /api/users</button>
+        <div id="users-result"></div>
+    </div>
+
+    <div class="test">
+        <h3>Test 3: Create Gig</h3>
+        <button onclick="testCreateGig()">Test POST /api/gigs</button>
+        <div id="gig-result"></div>
+    </div>
+
+    <script>
+        async function testHealth() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                document.getElementById('health-result').innerHTML = 
+                    '<div class="success">' + JSON.stringify(data, null, 2) + '</div>';
+            } catch (error) {
+                document.getElementById('health-result').innerHTML = 
+                    '<div class="error">Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testGetUsers() {
+            try {
+                const response = await fetch('/api/users');
+                const data = await response.json();
+                document.getElementById('users-result').innerHTML = 
+                    '<div class="success"><pre>' + JSON.stringify(data, null, 2) + '</pre></div>';
+            } catch (error) {
+                document.getElementById('users-result').innerHTML = 
+                    '<div class="error">Error: ' + error.message + '</div>';
+            }
+        }
+
+        async function testCreateGig() {
+            try {
+                const response = await fetch('/api/gigs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sellerId: 'u1',
+                        title: 'Test Gig',
+                        description: 'This is a test gig',
+                        department: 'CSE',
+                        price: 1000,
+                        deliveryDays: 5,
+                        tags: ['test'],
+                        image: 'https://example.com/image.jpg'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('gig-result').innerHTML = 
+                    '<div class="success"><pre>' + JSON.stringify(data, null, 2) + '</pre></div>';
+            } catch (error) {
+                document.getElementById('gig-result').innerHTML = 
+                    '<div class="error">Error: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>

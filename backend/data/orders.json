@@ -1,0 +1,24 @@
+[
+    {
+        "id": "o1770525152",
+        "gigId": "g1770525126",
+        "jobId": null,
+        "buyerId": 4,
+        "sellerId": 6,
+        "amount": 50000,
+        "status": "active",
+        "createdAt": "2026-02-08",
+        "deliveryDate": "2026-02-13"
+    },
+    {
+        "id": "o1770525782",
+        "gigId": "g1770525765",
+        "jobId": null,
+        "buyerId": 4,
+        "sellerId": 6,
+        "amount": 5852,
+        "status": "active",
+        "createdAt": "2026-02-08",
+        "deliveryDate": "2026-03-31"
+    }
+]

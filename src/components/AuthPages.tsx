@@ -114,7 +114,7 @@ export function RegisterPage() {
   const { register, setPage } = useStore();
   const [form, setForm] = useState({
     name: '', email: '', password: '', department: 'CSE' as Department,
-    bio: '', skills: '', university: 'University of Green Valley',
+    bio: '', skills: '', university: 'University of Global Village',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -134,7 +134,7 @@ export function RegisterPage() {
         university: form.university,
       });
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }

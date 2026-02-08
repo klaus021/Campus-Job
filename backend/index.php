@@ -1,8 +1,8 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=UTF-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
@@ -16,18 +16,40 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 try {
     // Parse path and query
+    $uri = $_SERVER['REQUEST_URI'];
     $path = parse_url($uri, PHP_URL_PATH);
-    $path = preg_replace('#^/backend#', '', $path); // Remove /backend prefix if present
+    
+    // Remove common prefixes - more robust handling
+    $path = preg_replace('#^/university-gig-marketplace-clone/backend#i', '', $path);
+    $path = preg_replace('#^/backend#i', '', $path);
+    
+    // Ensure path starts with /
+    if (empty($path)) {
+        $path = '/';
+    }
+    if ($path[0] !== '/') {
+        $path = '/' . $path;
+    }
+    
     $query = parse_url($uri, PHP_URL_QUERY);
     
+    // Debug: Log requests to PHP error log (uncomment to debug)
+    error_log("API Request - URI: $uri | Path: $path | Method: $method");
+    
+    // Health check
+    if (preg_match('#^/api/health$#i', $path) && $method == 'GET') {
+        echo json_encode(['status' => 'ok', 'database' => 'connected', 'path_received' => $path]);
+        exit;
+    }
+    
     // Users endpoints
-    if (preg_match('#^/api/users$#', $path) && $method == 'GET') {
+    if (preg_match('#^/api/users$#i', $path) && $method == 'GET') {
         $users = get_users();
         echo json_encode($users);
         exit;
     }
     
-    if (preg_match('#^/api/users/(\d+)$#', $path, $matches) && $method == 'GET') {
+    if (preg_match('#^/api/users/(\d+)$#i', $path, $matches) && $method == 'GET') {
         $user = get_user_by_id($matches[1]);
         if ($user) {
             echo json_encode($user);
@@ -37,7 +59,6 @@ try {
         }
         exit;
     }
-    
     // Gigs endpoints
     if (preg_match('#^/api/gigs$#', $path) && $method == 'GET') {
         $gigs = get_gigs();
@@ -120,8 +141,10 @@ try {
                 $data['department'],
                 $data['bio'] ?? '',
                 $data['skills'] ?? [],
-                $data['university'] ?? 'University of Green Valley'
+                $data['university'] ?? 'University of Global Village'
             );
+            // Remove password from response for security
+            unset($user['password']);
             echo json_encode($user);
         } catch (Exception $e) {
             http_response_code(400);
@@ -141,6 +164,8 @@ try {
         
         $user = login_user($data['email'], $data['password']);
         if ($user) {
+            // Remove password from response for security
+            unset($user['password']);
             echo json_encode($user);
         } else {
             http_response_code(401);

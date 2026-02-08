@@ -119,37 +119,37 @@ const sampleUsers: User[] = [
   {
     id: 'u1', name: 'Rahim Ahmed', email: 'rahim@ugv.edu', password: '123456',
     avatar: '', department: 'CSE', bio: 'Full-stack developer specializing in React & Node.js. 3rd year CSE student passionate about building web applications.',
-    skills: ['React', 'Node.js', 'Python', 'MongoDB', 'TypeScript'], university: 'University of Green Valley',
+    skills: ['React', 'Node.js', 'Python', 'MongoDB', 'TypeScript'], university: 'University of Global Village',
     rating: 4.8, reviewCount: 24, joinedDate: '2024-01-15', balance: 15000, completedJobs: 24
   },
   {
     id: 'u2', name: 'Fatima Khan', email: 'fatima@ugv.edu', password: '123456',
     avatar: '', department: 'EEE', bio: 'EEE student with expertise in circuit design, PCB layout, and embedded systems programming.',
-    skills: ['Circuit Design', 'MATLAB', 'Arduino', 'PCB Design', 'Embedded C'], university: 'University of Green Valley',
+    skills: ['Circuit Design', 'MATLAB', 'Arduino', 'PCB Design', 'Embedded C'], university: 'University of Global Village',
     rating: 4.9, reviewCount: 18, joinedDate: '2024-02-20', balance: 22000, completedJobs: 18
   },
   {
     id: 'u3', name: 'Arif Hassan', email: 'arif@ugv.edu', password: '123456',
     avatar: '', department: 'Civil', bio: 'Civil engineering student proficient in AutoCAD, structural analysis, and project estimation.',
-    skills: ['AutoCAD', 'ETABS', 'Revit', 'Structural Analysis', 'Estimation'], university: 'University of Green Valley',
+    skills: ['AutoCAD', 'ETABS', 'Revit', 'Structural Analysis', 'Estimation'], university: 'University of Global Village',
     rating: 4.7, reviewCount: 12, joinedDate: '2024-03-10', balance: 8500, completedJobs: 12
   },
   {
     id: 'u4', name: 'Nusrat Jahan', email: 'nusrat@ugv.edu', password: '123456',
     avatar: '', department: 'CSE', bio: 'UI/UX designer and frontend developer. I create beautiful, user-friendly interfaces.',
-    skills: ['Figma', 'UI/UX', 'React', 'Tailwind CSS', 'Adobe XD'], university: 'University of Green Valley',
+    skills: ['Figma', 'UI/UX', 'React', 'Tailwind CSS', 'Adobe XD'], university: 'University of Global Village',
     rating: 4.9, reviewCount: 31, joinedDate: '2023-11-05', balance: 28000, completedJobs: 31
   },
   {
     id: 'u5', name: 'Kamal Uddin', email: 'kamal@ugv.edu', password: '123456',
     avatar: '', department: 'Mechanical', bio: 'Mechanical engineering student skilled in SolidWorks, 3D modeling, and thermodynamics.',
-    skills: ['SolidWorks', '3D Modeling', 'ANSYS', 'AutoCAD', 'MATLAB'], university: 'University of Green Valley',
+    skills: ['SolidWorks', '3D Modeling', 'ANSYS', 'AutoCAD', 'MATLAB'], university: 'University of Global Village',
     rating: 4.6, reviewCount: 9, joinedDate: '2024-04-01', balance: 5200, completedJobs: 9
   },
   {
     id: 'u6', name: 'Sara Begum', email: 'sara@ugv.edu', password: '123456',
     avatar: '', department: 'Cyber Security', bio: 'Cybersecurity enthusiast with expertise in network security, penetration testing, and ethical hacking.',
-    skills: ['Penetration Testing', 'Network Security', 'Python', 'Kali Linux', 'OSINT'], university: 'University of Green Valley',
+    skills: ['Penetration Testing', 'Network Security', 'Python', 'Kali Linux', 'OSINT'], university: 'University of Global Village',
     rating: 4.8, reviewCount: 15, joinedDate: '2024-01-30', balance: 12000, completedJobs: 15
   },
 ];
@@ -319,14 +319,20 @@ export const useStore = create<AppState>((set, get) => ({
       
       if (response.ok) {
         const user = await response.json();
-        set({ currentUser: user as User, currentPage: 'home' });
+        // Store password locally for frontend-only comparisons
+        const userWithPassword = { ...user, password } as User;
+        set({ currentUser: userWithPassword, currentPage: 'home' });
         return true;
+      } else {
+        const errorData = await response.json();
+        console.error('API login failed:', errorData.error);
       }
     } catch (error) {
       console.error('API login error:', error);
     }
     
-    // Fallback to local authentication for demo accounts
+    // Fallback to demo accounts (pre-loaded users with known passwords)
+    // This allows testing without backend connectivity
     const user = get().users.find(u => u.email === email && u.password === password);
     if (user) {
       set({ currentUser: user, currentPage: 'home' });
@@ -351,31 +357,23 @@ export const useStore = create<AppState>((set, get) => ({
         }),
       });
       
-      if (response.ok) {
-        const user = await response.json();
-        set(state => ({
-          users: [...state.users, user as User],
-          currentUser: user as User,
-          currentPage: 'home'
-        }));
-        return;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Registration failed');
       }
+      
+      const user = await response.json();
+      // Add password to user object for local state (frontend only)
+      const userWithPassword = { ...user, password: userData.password } as User;
+      set(state => ({
+        users: [...state.users, userWithPassword],
+        currentUser: userWithPassword,
+        currentPage: 'home'
+      }));
     } catch (error) {
-      console.error('API register error:', error);
+      console.error('Registration error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Registration failed. Please try again.');
     }
-    
-    // Fallback to local registration
-    const newUser: User = {
-      ...userData,
-      id: 'u' + Date.now(),
-      avatar: '',
-      rating: 0,
-      reviewCount: 0,
-      joinedDate: new Date().toISOString().split('T')[0],
-      balance: 0,
-      completedJobs: 0,
-    };
-    set(state => ({ users: [...state.users, newUser], currentUser: newUser, currentPage: 'home' }));
   },
 
   logout: () => set({ currentUser: null, currentPage: 'home' }),
@@ -424,22 +422,29 @@ export const useStore = create<AppState>((set, get) => ({
 
   createGig: async (gigData) => {
     try {
+      console.log('🚀 Creating gig:', gigData);
       const response = await fetch('/api/gigs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(gigData),
       });
       
+      console.log('📡 API Response Status:', response.status);
       if (response.ok) {
         const newGig = await response.json();
+        console.log('✅ Gig created successfully:', newGig);
         set(state => ({ gigs: [newGig as Gig, ...state.gigs], currentPage: 'gigs' as Page }));
         return;
+      } else {
+        const errorText = await response.text();
+        console.error('❌ API returned error:', response.status, errorText);
       }
     } catch (error) {
-      console.error('API create gig error:', error);
+      console.error('❌ API create gig error:', error);
     }
     
     // Fallback to local creation
+    console.log('⚠️ Falling back to local gig creation (not saved to backend)');
     const newGig: Gig = {
       ...gigData,
       id: 'g' + Date.now(),
@@ -801,6 +806,67 @@ export const useStore = create<AppState>((set, get) => ({
         }],
       };
     });
+  },
+
+  initialize: async () => {
+    try {
+      // Load users from backend
+      const usersResponse = await fetch('/api/users');
+      if (usersResponse.ok) {
+        const users = await usersResponse.json();
+        if (Array.isArray(users) && users.length > 0) {
+          set({ users });
+        }
+      }
+      
+      // Load gigs from backend
+      const gigsResponse = await fetch('/api/gigs');
+      if (gigsResponse.ok) {
+        const gigs = await gigsResponse.json();
+        if (Array.isArray(gigs) && gigs.length > 0) {
+          set({ gigs });
+        }
+      }
+      
+      // Load jobs from backend
+      const jobsResponse = await fetch('/api/jobs');
+      if (jobsResponse.ok) {
+        const jobs = await jobsResponse.json();
+        if (Array.isArray(jobs) && jobs.length > 0) {
+          set({ jobs });
+        }
+      }
+      
+      // Load orders from backend
+      const ordersResponse = await fetch('/api/orders');
+      if (ordersResponse.ok) {
+        const orders = await ordersResponse.json();
+        if (Array.isArray(orders) && orders.length > 0) {
+          set({ orders });
+        }
+      }
+      
+      // Load messages from backend
+      const messagesResponse = await fetch('/api/messages');
+      if (messagesResponse.ok) {
+        const messages = await messagesResponse.json();
+        if (Array.isArray(messages) && messages.length > 0) {
+          set({ messages });
+        }
+      }
+      
+      // Load reviews from backend
+      const reviewsResponse = await fetch('/api/reviews');
+      if (reviewsResponse.ok) {
+        const reviews = await reviewsResponse.json();
+        if (Array.isArray(reviews) && reviews.length > 0) {
+          set({ reviews });
+        }
+      }
+    } catch (error) {
+      console.warn('Warning: Could not load data from backend, using fallback data', error);
+      // Fall back to default data if backend is unavailable
+    }
   },
 
   getUserById: (id) => get().users.find(u => u.id === id),

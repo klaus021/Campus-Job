@@ -1,0 +1,17 @@
+[
+    {
+        "id": "j1770525078",
+        "clientId": 6,
+        "title": "i will lend you money",
+        "description": "Fahhhhhhhhh",
+        "department": "CSE",
+        "budget": 5000,
+        "deadline": "2026-02-09",
+        "skills": [
+            "Faahhhhhhh"
+        ],
+        "status": "open",
+        "applicants": [],
+        "createdAt": "2026-02-08"
+    }
+]

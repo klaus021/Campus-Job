@@ -25,12 +25,12 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `users` (`name`,`email`,`password`,`department`,`bio`,`skills`,`university`,`rating`,`reviewCount`,`joinedDate`,`balance`,`completedJobs`) VALUES
-('Rahim Ahmed', 'rahim@ugv.edu', '123456', 'CSE', 'Full-stack developer specializing in React & Node.js. 3rd year CSE student passionate about building web applications.', 'React,Node.js,Python,MongoDB,TypeScript', 'University of Green Valley', 4.8, 24, '2024-01-15', 15000, 24),
-('Fatima Khan', 'fatima@ugv.edu', '123456', 'EEE', 'EEE student with expertise in circuit design, PCB layout, and embedded systems programming.', 'Circuit Design,MATLAB,Arduino,PCB Design,Embedded C', 'University of Green Valley', 4.9, 18, '2024-02-20', 22000, 18),
-('Arif Hassan', 'arif@ugv.edu', '123456', 'Civil', 'Civil engineering student proficient in AutoCAD, structural analysis, and project estimation.', 'AutoCAD,ETABS,Revit,Structural Analysis,Estimation', 'University of Green Valley', 4.7, 12, '2024-03-10', 8500, 12),
-('Nusrat Jahan', 'nusrat@ugv.edu', '123456', 'CSE', 'UI/UX designer and frontend developer. I create beautiful, user-friendly interfaces.', 'Figma,UI/UX,React,Tailwind CSS,Adobe XD', 'University of Green Valley', 4.9, 31, '2023-11-05', 28000, 31),
-('Kamal Uddin', 'kamal@ugv.edu', '123456', 'Mechanical', 'Mechanical engineering student skilled in SolidWorks, 3D modeling, and thermodynamics.', 'SolidWorks,3D Modeling,ANSYS,AutoCAD,MATLAB', 'University of Green Valley', 4.6, 9, '2024-04-01', 5200, 9),
-('Sara Begum', 'sara@ugv.edu', '123456', 'Cyber Security', 'Cybersecurity enthusiast with expertise in network security, penetration testing, and ethical hacking.', 'Penetration Testing,Network Security,Python,Kali Linux,OSINT', 'University of Green Valley', 4.8, 15, '2024-01-30', 12000, 15);
+('Rahim Ahmed', 'rahim@ugv.edu', '123456', 'CSE', 'Full-stack developer specializing in React & Node.js. 3rd year CSE student passionate about building web applications.', 'React,Node.js,Python,MongoDB,TypeScript', 'University of Global Village', 4.8, 24, '2024-01-15', 15000, 24),
+('Fatima Khan', 'fatima@ugv.edu', '123456', 'EEE', 'EEE student with expertise in circuit design, PCB layout, and embedded systems programming.', 'Circuit Design,MATLAB,Arduino,PCB Design,Embedded C', 'University of Global Village', 4.9, 18, '2024-02-20', 22000, 18),
+('Arif Hassan', 'arif@ugv.edu', '123456', 'Civil', 'Civil engineering student proficient in AutoCAD, structural analysis, and project estimation.', 'AutoCAD,ETABS,Revit,Structural Analysis,Estimation', 'University of Global Village', 4.7, 12, '2024-03-10', 8500, 12),
+('Nusrat Jahan', 'nusrat@ugv.edu', '123456', 'CSE', 'UI/UX designer and frontend developer. I create beautiful, user-friendly interfaces.', 'Figma,UI/UX,React,Tailwind CSS,Adobe XD', 'University of Global Village', 4.9, 31, '2023-11-05', 28000, 31),
+('Kamal Uddin', 'kamal@ugv.edu', '123456', 'Mechanical', 'Mechanical engineering student skilled in SolidWorks, 3D modeling, and thermodynamics.', 'SolidWorks,3D Modeling,ANSYS,AutoCAD,MATLAB', 'University of Global Village', 4.6, 9, '2024-04-01', 5200, 9),
+('Sara Begum', 'sara@ugv.edu', '123456', 'Cyber Security', 'Cybersecurity enthusiast with expertise in network security, penetration testing, and ethical hacking.', 'Penetration Testing,Network Security,Python,Kali Linux,OSINT', 'University of Global Village', 4.8, 15, '2024-01-30', 12000, 15);
 
 -- Gigs table
 DROP TABLE IF EXISTS `gigs`;

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useStore } from './store';
 import { Navbar } from './components/Navbar';
 import { HomePage } from './components/HomePage';

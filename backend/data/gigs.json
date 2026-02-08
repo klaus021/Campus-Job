@@ -1,0 +1,123 @@
+[
+    {
+        "id": "g1770523617",
+        "sellerId": "u1",
+        "title": "Test Gig 1770523617",
+        "description": "This is a test gig",
+        "department": "CSE",
+        "price": 1000,
+        "deliveryDays": 5,
+        "tags": [
+            "test",
+            "sample"
+        ],
+        "rating": 0,
+        "reviewCount": 0,
+        "orders": 0,
+        "image": "https://example.com/image.jpg",
+        "createdAt": "2026-02-08"
+    },
+    {
+        "id": "g1770523996",
+        "sellerId": "u1",
+        "title": "Test Gig 1770523996",
+        "description": "This is a test gig",
+        "department": "CSE",
+        "price": 1000,
+        "deliveryDays": 5,
+        "tags": [
+            "test",
+            "sample"
+        ],
+        "rating": 0,
+        "reviewCount": 0,
+        "orders": 0,
+        "image": "https://example.com/image.jpg",
+        "createdAt": "2026-02-08"
+    },
+    {
+        "id": "g1770523997",
+        "sellerId": "u1",
+        "title": "Test Gig 1770523997",
+        "description": "This is a test gig",
+        "department": "CSE",
+        "price": 1000,
+        "deliveryDays": 5,
+        "tags": [
+            "test",
+            "sample"
+        ],
+        "rating": 0,
+        "reviewCount": 0,
+        "orders": 0,
+        "image": "https://example.com/image.jpg",
+        "createdAt": "2026-02-08"
+    },
+    {
+        "id": "g1770524009",
+        "sellerId": "u1",
+        "title": "Test Gig 1770524009",
+        "description": "This is a test gig",
+        "department": "CSE",
+        "price": 1000,
+        "deliveryDays": 5,
+        "tags": [
+            "test",
+            "sample"
+        ],
+        "rating": 0,
+        "reviewCount": 0,
+        "orders": 0,
+        "image": "https://example.com/image.jpg",
+        "createdAt": "2026-02-08"
+    },
+    {
+        "id": "g1770524739",
+        "sellerId": 4,
+        "title": "ascas",
+        "description": "ascasd",
+        "department": "CSE",
+        "price": 5385,
+        "deliveryDays": 1655,
+        "tags": [],
+        "rating": 0,
+        "reviewCount": 0,
+        "orders": 0,
+        "image": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop",
+        "createdAt": "2026-02-08"
+    },
+    {
+        "id": "g1770525126",
+        "sellerId": 6,
+        "title": "i will lend you money",
+        "description": "fahhhhhhhh",
+        "department": "CSE",
+        "price": 50000,
+        "deliveryDays": 5,
+        "tags": [
+            "fahhhhh"
+        ],
+        "rating": 0,
+        "reviewCount": 0,
+        "orders": 0,
+        "image": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
+        "createdAt": "2026-02-08"
+    },
+    {
+        "id": "g1770525765",
+        "sellerId": 6,
+        "title": "hgfdssdfghj",
+        "description": "wertyuijhgcxzxcvbhj",
+        "department": "CSE",
+        "price": 5852,
+        "deliveryDays": 51,
+        "tags": [
+            "asdfghjk"
+        ],
+        "rating": 0,
+        "reviewCount": 0,
+        "orders": 0,
+        "image": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
+        "createdAt": "2026-02-08"
+    }
+]
