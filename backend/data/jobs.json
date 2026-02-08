@@ -13,5 +13,20 @@
         "status": "open",
         "applicants": [],
         "createdAt": "2026-02-08"
+    },
+    {
+        "id": "j1770534911",
+        "clientId": 4,
+        "title": "Need a web developer",
+        "description": "as",
+        "department": "CSE",
+        "budget": 1000,
+        "deadline": "2026-02-10",
+        "skills": [
+            "html css"
+        ],
+        "status": "open",
+        "applicants": [],
+        "createdAt": "2026-02-08"
     }
 ]

@@ -119,5 +119,23 @@
         "orders": 0,
         "image": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=250&fit=crop",
         "createdAt": "2026-02-08"
+    },
+    {
+        "id": "g1770532877",
+        "sellerId": 4,
+        "title": "I will create any Landing Page",
+        "description": "Create any landing pages with basic web design using html and css",
+        "department": "CSE",
+        "price": 499,
+        "deliveryDays": 1,
+        "tags": [
+            "html",
+            "css"
+        ],
+        "rating": 0,
+        "reviewCount": 0,
+        "orders": 0,
+        "image": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=250&fit=crop",
+        "createdAt": "2026-02-08"
     }
 ]

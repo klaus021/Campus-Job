@@ -1,1 +1,10 @@
-[]
+[
+    {
+        "id": "m1770535656",
+        "senderId": 4,
+        "receiverId": "u6",
+        "content": "hey",
+        "timestamp": "2026-02-08T08:27:36",
+        "read": false
+    }
+]
