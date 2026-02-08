@@ -16,9 +16,9 @@ export function EditProfilePage() {
     skills: currentUser.skills.join(', '),
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile({
+    await updateProfile({
       name: form.name,
       bio: form.bio,
       department: form.department,

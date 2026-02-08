@@ -15,9 +15,9 @@ export function OrdersPage() {
   const sellingOrders = orders.filter(o => o.sellerId === currentUser.id);
   const displayOrders = tab === 'buying' ? buyingOrders : sellingOrders;
 
-  const handleReview = () => {
+  const handleReview = async () => {
     if (!reviewModal || !reviewComment.trim()) return;
-    addReview(reviewModal.orderId, reviewModal.revieweeId, reviewModal.gigId, reviewRating, reviewComment);
+    await addReview(reviewModal.orderId, reviewModal.revieweeId, reviewModal.gigId, reviewRating, reviewComment);
     setReviewModal(null);
     setReviewRating(5);
     setReviewComment('');

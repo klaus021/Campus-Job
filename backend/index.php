@@ -149,6 +149,187 @@ try {
         exit;
     }
 
+    // Gigs endpoints
+    if (preg_match('#^/api/gigs$#', $path) && $method == 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['sellerId'], $data['title'], $data['description'], $data['department'], $data['price'], $data['deliveryDays'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            exit;
+        }
+        
+        try {
+            $gig = create_gig(
+                $data['sellerId'],
+                $data['title'],
+                $data['description'],
+                $data['department'],
+                $data['price'],
+                $data['deliveryDays'],
+                $data['tags'] ?? [],
+                $data['image'] ?? ''
+            );
+            echo json_encode($gig);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    // Jobs endpoints
+    if (preg_match('#^/api/jobs$#', $path) && $method == 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['clientId'], $data['title'], $data['description'], $data['department'], $data['budget'], $data['deadline'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            exit;
+        }
+        
+        try {
+            $job = create_job(
+                $data['clientId'],
+                $data['title'],
+                $data['description'],
+                $data['department'],
+                $data['budget'],
+                $data['deadline'],
+                $data['skills'] ?? []
+            );
+            echo json_encode($job);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    // Orders endpoints
+    if (preg_match('#^/api/orders$#', $path) && $method == 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['buyerId'], $data['sellerId'], $data['amount'], $data['deliveryDate'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            exit;
+        }
+        
+        try {
+            $order = create_order(
+                $data['gigId'] ?? null,
+                $data['jobId'] ?? null,
+                $data['buyerId'],
+                $data['sellerId'],
+                $data['amount'],
+                $data['status'] ?? 'active',
+                $data['deliveryDate']
+            );
+            echo json_encode($order);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    // Messages endpoints
+    if (preg_match('#^/api/messages$#', $path) && $method == 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['senderId'], $data['receiverId'], $data['content'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            exit;
+        }
+        
+        try {
+            $message = create_message(
+                $data['senderId'],
+                $data['receiverId'],
+                $data['content']
+            );
+            echo json_encode($message);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    // Notifications endpoints
+    if (preg_match('#^/api/notifications$#', $path) && $method == 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['userId'], $data['type'], $data['title'], $data['content'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            exit;
+        }
+        
+        try {
+            $notification = create_notification(
+                $data['userId'],
+                $data['type'],
+                $data['title'],
+                $data['content']
+            );
+            echo json_encode($notification);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    // Reviews endpoints
+    if (preg_match('#^/api/reviews$#', $path) && $method == 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['orderId'], $data['reviewerId'], $data['revieweeId'], $data['rating'], $data['comment'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            exit;
+        }
+        
+        try {
+            $review = create_review(
+                $data['orderId'],
+                $data['reviewerId'],
+                $data['revieweeId'],
+                $data['gigId'] ?? null,
+                $data['rating'],
+                $data['comment']
+            );
+            echo json_encode($review);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    // Update user profile
+    if (preg_match('#^/api/users/(\d+)$#', $path, $matches) && $method == 'PUT') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $userId = $matches[1];
+        
+        try {
+            $user = update_user($userId, $data);
+            if ($user) {
+                echo json_encode($user);
+            } else {
+                http_response_code(404);
+                echo json_encode(['error' => 'User not found']);
+            }
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
     // Health check
     if (preg_match('#^/api/health$#', $path) && $method == 'GET') {
         echo json_encode(['status' => 'ok', 'database' => 'connected']);

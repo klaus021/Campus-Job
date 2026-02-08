@@ -10,7 +10,7 @@ export function GigDetailPage() {
   const seller = getUserById(gig.sellerId);
   const gigReviews = reviews.filter(r => r.gigId === gig.id);
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (!currentUser) {
       setPage('login');
       return;
@@ -19,7 +19,7 @@ export function GigDetailPage() {
       alert('You cannot order your own gig!');
       return;
     }
-    placeOrder(gig.id);
+    await placeOrder(gig.id);
   };
 
   const handleMessage = () => {

@@ -39,9 +39,9 @@ export function MessagesPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages.length]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!newMsg.trim() || !activeChat) return;
-    sendMessage(activeChat, newMsg.trim());
+    await sendMessage(activeChat, newMsg.trim());
     setNewMsg('');
   };
 

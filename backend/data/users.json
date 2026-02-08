@@ -17,5 +17,57 @@
         "joinedDate": "2026-02-08",
         "balance": 0,
         "completedJobs": 0
+    },
+    {
+        "id": 2,
+        "name": "Test User",
+        "email": "test@test.com",
+        "password": "$2y$12$kijsz8B3idiMPpjkWxy/9OnnbbpNrHZFb.t59Ea6CZhShKSx3TpNm",
+        "avatar": "",
+        "department": "CSE",
+        "bio": "Test",
+        "skills": [],
+        "university": "Test Univ",
+        "rating": 0,
+        "reviewCount": 0,
+        "joinedDate": "2026-02-08",
+        "balance": 0,
+        "completedJobs": 0
+    },
+    {
+        "id": 3,
+        "name": "Touhid",
+        "email": "mdtouhid2147@gmail.com",
+        "password": "$2y$12$v.aM5MWnAr8TRBgV/5DOPe08N8937Uxl/X5eF7joctDRifpe4rpSO",
+        "avatar": "",
+        "department": "CSE",
+        "bio": "adsadadas",
+        "skills": [
+            "aa"
+        ],
+        "university": "University of Green Valley",
+        "rating": 0,
+        "reviewCount": 0,
+        "joinedDate": "2026-02-08",
+        "balance": 0,
+        "completedJobs": 0
+    },
+    {
+        "id": 4,
+        "name": "TTT",
+        "email": "touhid.2147@gmail.com",
+        "password": "$2y$12$t/Ng.AKxW7tFUZFtRD2SmOQEN29mJC9WDWDklQdfhzxDVsGoER86m",
+        "avatar": "",
+        "department": "CSE",
+        "bio": "aaa",
+        "skills": [
+            "ccc"
+        ],
+        "university": "University of Green Valley",
+        "rating": 0,
+        "reviewCount": 0,
+        "joinedDate": "2026-02-08",
+        "balance": 0,
+        "completedJobs": 0
     }
 ]

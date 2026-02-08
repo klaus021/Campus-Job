@@ -22,9 +22,9 @@ export function CreateGigPage() {
 
   if (!currentUser) { setPage('login'); return null; }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    createGig({
+    await createGig({
       sellerId: currentUser.id,
       title: form.title,
       description: form.description,
@@ -138,9 +138,9 @@ export function CreateJobPage() {
 
   if (!currentUser) { setPage('login'); return null; }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    createJob({
+    await createJob({
       clientId: currentUser.id,
       title: form.title,
       description: form.description,

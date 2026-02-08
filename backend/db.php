@@ -107,6 +107,109 @@ function get_reviews() {
     return [];
 }
 
+function save_gigs($gigs) {
+    ensure_data_dir();
+    $file = DATA_DIR . '/gigs.json';
+    file_put_contents($file, json_encode($gigs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+function save_jobs($jobs) {
+    ensure_data_dir();
+    $file = DATA_DIR . '/jobs.json';
+    file_put_contents($file, json_encode($jobs, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+function save_orders($orders) {
+    ensure_data_dir();
+    $file = DATA_DIR . '/orders.json';
+    file_put_contents($file, json_encode($orders, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+function save_messages($messages) {
+    ensure_data_dir();
+    $file = DATA_DIR . '/messages.json';
+    file_put_contents($file, json_encode($messages, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+function save_notifications($notifications) {
+    ensure_data_dir();
+    $file = DATA_DIR . '/notifications.json';
+    file_put_contents($file, json_encode($notifications, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+function save_reviews($reviews) {
+    ensure_data_dir();
+    $file = DATA_DIR . '/reviews.json';
+    file_put_contents($file, json_encode($reviews, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+function save_transactions($transactions) {
+    ensure_data_dir();
+    $file = DATA_DIR . '/transactions.json';
+    file_put_contents($file, json_encode($transactions, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+}
+
+function create_gig($sellerId, $title, $description, $department, $price, $deliveryDays, $tags, $image) {
+    $gigs = get_gigs();
+    
+    $id = 'g' . time();
+    
+    $newGig = [
+        'id' => $id,
+        'sellerId' => $sellerId,
+        'title' => $title,
+        'description' => $description,
+        'department' => $department,
+        'price' => intval($price),
+        'deliveryDays' => intval($deliveryDays),
+        'tags' => is_array($tags) ? $tags : (empty($tags) ? [] : explode(',', $tags)),
+        'rating' => 0,
+        'reviewCount' => 0,
+        'orders' => 0,
+        'image' => $image,
+        'createdAt' => date('Y-m-d'),
+    ];
+    
+    $gigs[] = $newGig;
+    save_gigs($gigs);
+    
+    return $newGig;
+}
+
+function create_job($clientId, $title, $description, $department, $budget, $deadline, $skills) {
+    $jobs = get_jobs();
+    
+    $id = 'j' . time();
+    
+    $newJob = [
+        'id' => $id,
+        'clientId' => $clientId,
+        'title' => $title,
+        'description' => $description,
+        'department' => $department,
+        'budget' => intval($budget),
+        'deadline' => $deadline,
+        'skills' => is_array($skills) ? $skills : (empty($skills) ? [] : explode(',', $skills)),
+        'status' => 'open',
+        'applicants' => [],
+        'createdAt' => date('Y-m-d'),
+    ];
+    
+    $jobs[] = $newJob;
+    save_jobs($jobs);
+    
+    return $newJob;
+}
+
+function get_transactions() {
+    ensure_data_dir();
+    $file = DATA_DIR . '/transactions.json';
+    if (file_exists($file)) {
+        return json_decode(file_get_contents($file), true);
+    }
+    return [];
+}
+
 function create_user($name, $email, $password, $department, $bio, $skills, $university) {
     $users = get_users();
     
@@ -159,6 +262,128 @@ function login_user($email, $password) {
     }
     
     return null;
+}
+
+function update_user($userId, $updates) {
+    $users = get_users();
+    
+    foreach ($users as &$user) {
+        if ($user['id'] === $userId) {
+            $user = array_merge($user, $updates);
+            save_users($users);
+            return $user;
+        }
+    }
+    
+    return null;
+}
+
+function create_order($gigId, $jobId, $buyerId, $sellerId, $amount, $status, $deliveryDate) {
+    $orders = get_orders();
+    
+    $id = 'o' . time();
+    
+    $newOrder = [
+        'id' => $id,
+        'gigId' => $gigId,
+        'jobId' => $jobId,
+        'buyerId' => $buyerId,
+        'sellerId' => $sellerId,
+        'amount' => intval($amount),
+        'status' => $status,
+        'createdAt' => date('Y-m-d'),
+        'deliveryDate' => $deliveryDate,
+    ];
+    
+    $orders[] = $newOrder;
+    save_orders($orders);
+    
+    return $newOrder;
+}
+
+function create_message($senderId, $receiverId, $content) {
+    $messages = get_messages();
+    
+    $id = 'm' . time();
+    
+    $newMessage = [
+        'id' => $id,
+        'senderId' => $senderId,
+        'receiverId' => $receiverId,
+        'content' => $content,
+        'timestamp' => date('Y-m-d\TH:i:s'),
+        'read' => false,
+    ];
+    
+    $messages[] = $newMessage;
+    save_messages($messages);
+    
+    return $newMessage;
+}
+
+function create_notification($userId, $type, $title, $content) {
+    $notifications = get_notifications();
+    
+    $id = 'n' . time();
+    
+    $newNotification = [
+        'id' => $id,
+        'userId' => $userId,
+        'type' => $type,
+        'title' => $title,
+        'content' => $content,
+        'read' => false,
+        'timestamp' => date('Y-m-d\TH:i:s'),
+    ];
+    
+    $notifications[] = $newNotification;
+    save_notifications($notifications);
+    
+    return $newNotification;
+}
+
+function create_review($orderId, $reviewerId, $revieweeId, $gigId, $rating, $comment) {
+    $reviews = get_reviews();
+    
+    $id = 'r' . time();
+    
+    $newReview = [
+        'id' => $id,
+        'orderId' => $orderId,
+        'reviewerId' => $reviewerId,
+        'revieweeId' => $revieweeId,
+        'gigId' => $gigId,
+        'rating' => intval($rating),
+        'comment' => $comment,
+        'createdAt' => date('Y-m-d'),
+    ];
+    
+    $reviews[] = $newReview;
+    save_reviews($reviews);
+    
+    return $newReview;
+}
+
+function create_transaction($fromId, $toId, $amount, $type, $description, $status) {
+    $transactions = get_transactions();
+    
+    $id = 't' . time();
+    
+    $newTransaction = [
+        'id' => $id,
+        'fromId' => $fromId,
+        'toId' => $toId,
+        'amount' => intval($amount),
+        'type' => $type,
+        'description' => $description,
+        'status' => $status,
+        'createdAt' => date('Y-m-d'),
+    ];
+    
+    $transactions[] = $newTransaction;
+    save_transactions($transactions);
+    
+    return $newTransaction;
 }
 
 // Test storage (for debugging)

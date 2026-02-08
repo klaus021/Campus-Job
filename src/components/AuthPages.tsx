@@ -9,12 +9,22 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!login(email, password)) {
-      setError('Invalid email or password. Try: rahim@ugv.edu / 123456');
+    setError('');
+    setLoading(true);
+    try {
+      const success = await login(email, password);
+      if (!success) {
+        setError('Invalid email or password. Try: rahim@ugv.edu / 123456');
+      }
+    } catch (err) {
+      setError('Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,8 +71,8 @@ export function LoginPage() {
                 </button>
               </div>
             </div>
-            <button type="submit" className="w-full py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-colors">
-              Sign In
+            <button type="submit" className="w-full py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={loading}>
+              {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
@@ -106,18 +116,28 @@ export function RegisterPage() {
     name: '', email: '', password: '', department: 'CSE' as Department,
     bio: '', skills: '', university: 'University of Green Valley',
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    register({
-      name: form.name,
-      email: form.email,
-      password: form.password,
-      department: form.department,
-      bio: form.bio,
-      skills: form.skills.split(',').map(s => s.trim()).filter(Boolean),
-      university: form.university,
-    });
+    setError('');
+    setLoading(true);
+    try {
+      await register({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        department: form.department,
+        bio: form.bio,
+        skills: form.skills.split(',').map(s => s.trim()).filter(Boolean),
+        university: form.university,
+      });
+    } catch (err) {
+      setError('Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -132,6 +152,9 @@ export function RegisterPage() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-2xl p-8">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl">{error}</div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -193,8 +216,8 @@ export function RegisterPage() {
                 placeholder="React, Python, MATLAB..."
               />
             </div>
-            <button type="submit" className="w-full py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-colors">
-              Create Account
+            <button type="submit" className="w-full py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={loading}>
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
         </div>

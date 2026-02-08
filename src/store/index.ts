@@ -255,10 +255,10 @@ interface AppState {
 
   // Actions
   setPage: (page: Page) => void;
-  login: (email: string, password: string) => boolean;
-  register: (user: Omit<User, 'id' | 'rating' | 'reviewCount' | 'joinedDate' | 'balance' | 'completedJobs' | 'avatar'>) => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (user: Omit<User, 'id' | 'rating' | 'reviewCount' | 'joinedDate' | 'balance' | 'completedJobs' | 'avatar'>) => Promise<void>;
   logout: () => void;
-  updateProfile: (updates: Partial<User>) => void;
+  updateProfile: (updates: Partial<User>) => Promise<void>;
   
   setSelectedGig: (id: string | null) => void;
   setSelectedJob: (id: string | null) => void;
@@ -268,19 +268,19 @@ interface AppState {
   setDepartmentFilter: (dept: Department | 'All') => void;
   setSortBy: (sort: string) => void;
 
-  createGig: (gig: Omit<Gig, 'id' | 'rating' | 'reviewCount' | 'orders' | 'createdAt'>) => void;
-  createJob: (job: Omit<Job, 'id' | 'status' | 'applicants' | 'createdAt'>) => void;
+  createGig: (gig: Omit<Gig, 'id' | 'rating' | 'reviewCount' | 'orders' | 'createdAt'>) => Promise<void>;
+  createJob: (job: Omit<Job, 'id' | 'status' | 'applicants' | 'createdAt'>) => Promise<void>;
   applyToJob: (jobId: string, coverLetter: string, proposedBudget: number) => void;
   acceptApplication: (applicationId: string) => void;
   
-  placeOrder: (gigId: string) => void;
+  placeOrder: (gigId: string) => Promise<void>;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
   
-  sendMessage: (receiverId: string, content: string) => void;
+  sendMessage: (receiverId: string, content: string) => Promise<void>;
   markNotificationRead: (id: string) => void;
   markAllNotificationsRead: () => void;
   
-  addReview: (orderId: string, revieweeId: string, gigId: string | undefined, rating: number, comment: string) => void;
+  addReview: (orderId: string, revieweeId: string, gigId: string | undefined, rating: number, comment: string) => Promise<void>;
 
   getUserById: (id: string) => User | undefined;
   getGigById: (id: string) => Gig | undefined;
@@ -309,7 +309,24 @@ export const useStore = create<AppState>((set, get) => ({
 
   setPage: (page) => set({ currentPage: page }),
   
-  login: (email, password) => {
+  login: async (email, password) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (response.ok) {
+        const user = await response.json();
+        set({ currentUser: user as User, currentPage: 'home' });
+        return true;
+      }
+    } catch (error) {
+      console.error('API login error:', error);
+    }
+    
+    // Fallback to local authentication for demo accounts
     const user = get().users.find(u => u.email === email && u.password === password);
     if (user) {
       set({ currentUser: user, currentPage: 'home' });
@@ -318,7 +335,36 @@ export const useStore = create<AppState>((set, get) => ({
     return false;
   },
   
-  register: (userData) => {
+  register: async (userData) => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: userData.name,
+          email: userData.email,
+          password: userData.password,
+          department: userData.department,
+          bio: userData.bio,
+          skills: userData.skills,
+          university: userData.university,
+        }),
+      });
+      
+      if (response.ok) {
+        const user = await response.json();
+        set(state => ({
+          users: [...state.users, user as User],
+          currentUser: user as User,
+          currentPage: 'home'
+        }));
+        return;
+      }
+    } catch (error) {
+      console.error('API register error:', error);
+    }
+    
+    // Fallback to local registration
     const newUser: User = {
       ...userData,
       id: 'u' + Date.now(),
@@ -334,7 +380,30 @@ export const useStore = create<AppState>((set, get) => ({
 
   logout: () => set({ currentUser: null, currentPage: 'home' }),
 
-  updateProfile: (updates) => {
+  updateProfile: async (updates) => {
+    const state = get();
+    if (!state.currentUser) return;
+    
+    try {
+      const response = await fetch(`/api/users/${state.currentUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      
+      if (response.ok) {
+        const updatedUser = await response.json();
+        set(st => ({
+          currentUser: updatedUser as User,
+          users: st.users.map(u => u.id === updatedUser.id ? updatedUser : u),
+        }));
+        return;
+      }
+    } catch (error) {
+      console.error('API update profile error:', error);
+    }
+    
+    // Fallback to local update
     set(state => {
       if (!state.currentUser) return state;
       const updatedUser = { ...state.currentUser, ...updates };
@@ -353,7 +422,24 @@ export const useStore = create<AppState>((set, get) => ({
   setDepartmentFilter: (dept) => set({ departmentFilter: dept }),
   setSortBy: (sort) => set({ sortBy: sort }),
 
-  createGig: (gigData) => {
+  createGig: async (gigData) => {
+    try {
+      const response = await fetch('/api/gigs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(gigData),
+      });
+      
+      if (response.ok) {
+        const newGig = await response.json();
+        set(state => ({ gigs: [newGig as Gig, ...state.gigs], currentPage: 'gigs' as Page }));
+        return;
+      }
+    } catch (error) {
+      console.error('API create gig error:', error);
+    }
+    
+    // Fallback to local creation
     const newGig: Gig = {
       ...gigData,
       id: 'g' + Date.now(),
@@ -365,7 +451,24 @@ export const useStore = create<AppState>((set, get) => ({
     set(state => ({ gigs: [newGig, ...state.gigs], currentPage: 'gigs' }));
   },
 
-  createJob: (jobData) => {
+  createJob: async (jobData) => {
+    try {
+      const response = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jobData),
+      });
+      
+      if (response.ok) {
+        const newJob = await response.json();
+        set(state => ({ jobs: [newJob as Job, ...state.jobs], currentPage: 'jobs' as Page }));
+        return;
+      }
+    } catch (error) {
+      console.error('API create job error:', error);
+    }
+    
+    // Fallback to local creation
     const newJob: Job = {
       ...jobData,
       id: 'j' + Date.now(),
@@ -438,12 +541,51 @@ export const useStore = create<AppState>((set, get) => ({
     });
   },
 
-  placeOrder: (gigId) => {
+  placeOrder: async (gigId) => {
     const { currentUser, gigs } = get();
     if (!currentUser) return;
     const gig = gigs.find(g => g.id === gigId);
     if (!gig) return;
     
+    const orderData = {
+      gigId,
+      buyerId: currentUser.id,
+      sellerId: gig.sellerId,
+      amount: gig.price,
+      status: 'active',
+      deliveryDate: new Date(Date.now() + gig.deliveryDays * 86400000).toISOString().split('T')[0],
+    };
+    
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      });
+      
+      if (response.ok) {
+        const newOrder = await response.json();
+        set(state => ({
+          orders: [...state.orders, newOrder as Order],
+          gigs: state.gigs.map(g => g.id === gigId ? { ...g, orders: g.orders + 1 } : g),
+          notifications: [...state.notifications, {
+            id: 'n' + Date.now(),
+            userId: gig.sellerId,
+            type: 'order' as const,
+            title: 'New Order!',
+            content: `${currentUser.name} ordered your "${gig.title}" gig.`,
+            read: false,
+            timestamp: new Date().toISOString(),
+          }],
+          currentPage: 'orders' as Page,
+        }));
+        return;
+      }
+    } catch (error) {
+      console.error('API place order error:', error);
+    }
+    
+    // Fallback to local placement
     const newOrder: Order = {
       id: 'o' + Date.now(),
       gigId,
@@ -455,20 +597,8 @@ export const useStore = create<AppState>((set, get) => ({
       deliveryDate: new Date(Date.now() + gig.deliveryDays * 86400000).toISOString().split('T')[0],
     };
 
-    const newTransaction: Transaction = {
-      id: 't' + Date.now(),
-      fromId: currentUser.id,
-      toId: gig.sellerId,
-      amount: gig.price,
-      type: 'payment',
-      description: `Payment for "${gig.title}"`,
-      status: 'pending',
-      createdAt: new Date().toISOString().split('T')[0],
-    };
-
     set(state => ({
       orders: [...state.orders, newOrder],
-      transactions: [...state.transactions, newTransaction],
       gigs: state.gigs.map(g => g.id === gigId ? { ...g, orders: g.orders + 1 } : g),
       notifications: [...state.notifications, {
         id: 'n' + Date.now(),
@@ -520,9 +650,44 @@ export const useStore = create<AppState>((set, get) => ({
     });
   },
 
-  sendMessage: (receiverId, content) => {
+  sendMessage: async (receiverId, content) => {
     const { currentUser } = get();
     if (!currentUser) return;
+    
+    const messageData = {
+      senderId: currentUser.id,
+      receiverId,
+      content,
+    };
+    
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(messageData),
+      });
+      
+      if (response.ok) {
+        const newMsg = await response.json();
+        set(state => ({
+          messages: [...state.messages, newMsg as Message],
+          notifications: [...state.notifications, {
+            id: 'n' + Date.now(),
+            userId: receiverId,
+            type: 'message' as const,
+            title: 'New Message',
+            content: `${currentUser.name} sent you a message.`,
+            read: false,
+            timestamp: new Date().toISOString(),
+          }],
+        }));
+        return;
+      }
+    } catch (error) {
+      console.error('API send message error:', error);
+    }
+    
+    // Fallback to local message creation
     const newMsg: Message = {
       id: 'm' + Date.now(),
       senderId: currentUser.id,
@@ -559,9 +724,54 @@ export const useStore = create<AppState>((set, get) => ({
     }));
   },
 
-  addReview: (orderId, revieweeId, gigId, rating, comment) => {
+  addReview: async (orderId, revieweeId, gigId, rating, comment) => {
     const { currentUser } = get();
     if (!currentUser) return;
+    
+    const reviewData = {
+      orderId,
+      reviewerId: currentUser.id,
+      revieweeId,
+      gigId,
+      rating,
+      comment,
+    };
+    
+    try {
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewData),
+      });
+      
+      if (response.ok) {
+        const newReview = await response.json();
+        set(state => {
+          const userReviews = [...state.reviews.filter(r => r.revieweeId === revieweeId), newReview as Review];
+          const avgRating = userReviews.reduce((sum, r) => sum + r.rating, 0) / userReviews.length;
+          
+          return {
+            reviews: [...state.reviews, newReview as Review],
+            users: state.users.map(u => u.id === revieweeId ? { ...u, rating: Math.round(avgRating * 10) / 10, reviewCount: u.reviewCount + 1 } : u),
+            gigs: gigId ? state.gigs.map(g => g.id === gigId ? { ...g, rating: Math.round(avgRating * 10) / 10, reviewCount: g.reviewCount + 1 } : g) : state.gigs,
+            notifications: [...state.notifications, {
+              id: 'n' + Date.now(),
+              userId: revieweeId,
+              type: 'review' as const,
+              title: 'New Review',
+              content: `${currentUser.name} left a ${rating}-star review.`,
+              read: false,
+              timestamp: new Date().toISOString(),
+            }],
+          };
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('API add review error:', error);
+    }
+    
+    // Fallback to local review creation
     const newReview: Review = {
       id: 'r' + Date.now(),
       orderId,
