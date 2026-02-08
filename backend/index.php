@@ -102,6 +102,53 @@ try {
         exit;
     }
 
+    // Auth endpoints
+    if (preg_match('#^/api/auth/register$#', $path) && $method == 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['name'], $data['email'], $data['password'], $data['department'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            exit;
+        }
+        
+        try {
+            $user = create_user(
+                $data['name'],
+                $data['email'],
+                $data['password'],
+                $data['department'],
+                $data['bio'] ?? '',
+                $data['skills'] ?? [],
+                $data['university'] ?? 'University of Green Valley'
+            );
+            echo json_encode($user);
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    if (preg_match('#^/api/auth/login$#', $path) && $method == 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (!isset($data['email'], $data['password'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing email or password']);
+            exit;
+        }
+        
+        $user = login_user($data['email'], $data['password']);
+        if ($user) {
+            echo json_encode($user);
+        } else {
+            http_response_code(401);
+            echo json_encode(['error' => 'Invalid email or password']);
+        }
+        exit;
+    }
+
     // Health check
     if (preg_match('#^/api/health$#', $path) && $method == 'GET') {
         echo json_encode(['status' => 'ok', 'database' => 'connected']);

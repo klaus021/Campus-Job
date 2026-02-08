@@ -1,0 +1,21 @@
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@ugv.edu",
+        "password": "$2y$12$7h0zRKhrBB2faD2aXH9ZtOOXuOJU6DXWfr/j9Eb3fAKdaNLRSOltW",
+        "avatar": "",
+        "department": "EEE",
+        "bio": "Electronics student",
+        "skills": [
+            "MATLAB",
+            "Electronics"
+        ],
+        "university": "University of Green Valley",
+        "rating": 0,
+        "reviewCount": 0,
+        "joinedDate": "2026-02-08",
+        "balance": 0,
+        "completedJobs": 0
+    }
+]
